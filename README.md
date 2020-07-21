@@ -9,27 +9,27 @@ This is a part of a project i.e. the "Citra IIUM membership system", and is inte
 
 ## Tables created by the script:
 
-1. USERS
+1. **USERS**
 
    - USERID: Unique ID for each user (Primary Key)
    - DISPLAYNAME: User's displayname
    - EMAIL: User's Email
    - USERPASSWORD: The encrypted password of the user.
 
-2. CLUBS
+2. **CLUBS**
 
    - CLUBID: Unique ID for each club (Primary Key)
    - CLUBNAME: Name of each club
    - NICHE: The niche for each club
 
-3. STAFFS - The club's office level management
+3. **STAFFS - The club's office level management**
 
    - STAFFID: Unique ID for each staff (Primary Key)
    - USERID: Relation with USERS table i.e. Each staff is a user (Foreign Key)
    - FULLNAME: Full name of the staff
    - Position: The position of the staff
 
-4. MEMBERS - The club's members
+4. **MEMBERS - The club's members**
 
    - MEMBERID: Unique ID for each member (Primary Key)
    - USERID: Relation with USERS table i.e. Each membership belongs to a user (Foreign Key)
@@ -43,12 +43,12 @@ This is a part of a project i.e. the "Citra IIUM membership system", and is inte
    - DESIGNATION: The assigned task from the club E.g. Musician
    - POSITION: Management position that the member currently holds.
 
-5. CLUB_STAFF_MANAGEMENT - Table that connects staff to clubs (one to many)
+5. **CLUB_STAFF_MANAGEMENT - Table that connects staff to clubs (one to many)**
 
    - CLUBID: Clubs (Foreign Key)
    - STAFFID: Staff (Foreign Key)
 
-6. USER_APPLICATION - New application to get into the clubs
+6. **USER_APPLICATION - New application to get into the clubs**
 
    - APPLICATIONID: Unique ID for each application made (Primary Key)
    - FULLNAME: Full name of applicant
