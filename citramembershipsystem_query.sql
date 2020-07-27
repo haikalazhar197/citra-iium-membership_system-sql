@@ -1,23 +1,37 @@
--- Basic Queries
-
 --Get all the members in CiTRA IIUM
 SELECT m.fullname, m.course, m.designation, m.position, c.clubname FROM MEMBERS m
 INNER JOIN clubs c ON m.clubid = c.clubid;
 
---Get members from IIUM Acoustic Band
+-- Search for members by name
 SELECT m.fullname, m.course, m.designation, m.position, c.clubname FROM MEMBERS m
 INNER JOIN clubs c ON m.clubid = c.clubid
-WHERE c.clubid = 1;
+WHERE m.fullname LIKE '%Haikal%';
+
+-- Search for members by name and clubs
+SELECT m.fullname, m.course, m.designation, m.position, c.clubname FROM MEMBERS m
+INNER JOIN 
+(SELECT clubid, clubname FROM clubs
+    WHERE clubname LIKE 'IIUM%Band') c 
+ON m.clubid = c.clubid
+WHERE m.fullname LIKE '%Haikal%';
+
+--get members from club search
+SELECT m.fullname, m.course, m.designation, m.position, c.clubname FROM MEMBERS m
+INNER JOIN clubs c ON m.clubid = c.clubid
+WHERE c.clubid IN (SELECT clubid FROM clubs WHERE clubname LIKE '%Band'); 
 
 --Get the Top Management for IIUM Acoustic Band
 SELECT m.fullname, m.course, m.designation, m.position, c.clubname FROM MEMBERS m
-INNER JOIN clubs c ON m.clubid = c.clubid
+INNER JOIN 
+(SELECT clubid, clubname FROM clubs 
+    WHERE clubname LIKE 'IIUM%Band') c 
+ON m.clubid = c.clubid
 WHERE m.position != 'None';
 
 --Get the staff assigned to IIUM Acoustic Band
-SELECT s.staffid, s.fullfname, s.position, g.clubname, g.niche FROM STAFFS s
+SELECT s.staffid, s.fullname, s.position, g.clubname, g.niche FROM STAFFS s
 INNER JOIN (SELECT e.staffid, c.clubname, c.niche FROM club_staff_management e 
-            INNER JOIN clubs c ON e.clubid = c.clubid WHERE e.clubid = 1) g 
+                INNER JOIN clubs c ON e.clubid = c.clubid WHERE c.clubname LIKE 'IIUM%Band') g 
 ON s.staffid = g.staffid;
 
 --Get all the staffs and the clubs they manage
@@ -30,12 +44,12 @@ ORDER BY s.staffid;
 --Get all the applicants for Acoustic Band That is in processing
 SELECT u.applicationid, u.fullname, u.email, u.age, u.matricno, u.course, u.kulliyah, u.application_status, c.clubname FROM user_application u 
 INNER JOIN clubs c ON u.clubid = c.clubid
-WHERE u.clubid = 1
+WHERE c.clubid IN (SELECT clubid FROM clubs WHERE clubname LIKE 'IIUM%Band')
 AND u.application_status = 'processing';
 
 --Get all the current active members of Acoustic Band Club
 SELECT * FROM MEMBERS m
-WHERE m.clubid = 1
+WHERE m.clubid IN (SELECT clubid FROM clubs WHERE clubname LIKE 'IIUM%Band')
 AND m.status = 'active';
 
 --Add a member to nasyeed club

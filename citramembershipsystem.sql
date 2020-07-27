@@ -1,5 +1,3 @@
--- Create Tables, Triggers, and Sequences
-
 DROP TABLE MEMBERS cascade constraints;
 DROP TABLE CLUBS cascade constraints;
 DROP TABLE STAFFS cascade constraints;

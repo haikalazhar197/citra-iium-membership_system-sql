@@ -1,10 +1,10 @@
 
--- Procedures and Functions
-
 --Procedure to create new user and membership on accepted application
 -- Accepts The application ID 
 -- Generates a random password for the user
 -- Create a membership field on the members table
+
+
 CREATE OR REPLACE PROCEDURE
 register_new_member(v_applicationid user_application.applicationid%TYPE)
 AS
@@ -29,24 +29,26 @@ BEGIN
     INTO v_fullname, v_email, v_age, v_matricno, v_course, v_kulliyah, v_clubid, v_application_status
     FROM user_application
     WHERE applicationid = v_applicationid;
-    DBMS_OUTPUT.PUT_LINE(v_fullname || ' ' || v_email || ' ' || v_age || ' ' || v_matricno || ' ' || v_course || ' ' || v_kulliyah || ' ' || v_clubid || ' ' || v_application_status);
-    
+
     -- check if the application is not already rejected or accepted
     IF v_application_status = 'processing' THEN
-        DBMS_OUTPUT.PUT_LINE('Executing process');
+        DBMS_OUTPUT.PUT_LINE('...creating new membersip');
         
         -- generate random password for the user
         SELECT dbms_random.string('A', 10) INTO v_randompass FROM dual;
-        DBMS_OUTPUT.PUT_LINE(v_randompass);
+        DBMS_OUTPUT.PUT_LINE('Users new Password: ' || v_randompass);
         
         -- create new user and retrieve the the users id
         INSERT INTO USERS(displayname, email, userpassword) VALUES(v_fullname, v_email, v_randompass);
         SELECT user_id_seq.currval INTO v_userid FROM DUAL;
-        DBMS_OUTPUT.PUT_LINE(v_userid);
+        DBMS_OUTPUT.PUT_LINE('New User created with id: ' || v_userid);
         
         -- create a new membership for the user 
         INSERT INTO MEMBERS(userid, clubid, fullname, age, matricno, course, kulliyah, status, designation, position) 
         VALUES(v_userid, v_clubid, v_fullname, v_age, v_matricno, v_course, v_kulliyah, 'active', 'member', 'None');
+        
+        DBMS_OUTPUT.PUT_LINE('Created new member: ' || v_fullname || ' ' || v_email || ' ' || v_age || ' ' || v_matricno || ' ' || v_course || ' ' || v_kulliyah || ' ' || v_clubid || ' ' || v_application_status);
+    
         
         -- change the status of the application to accpeted.
         UPDATE user_application 
@@ -54,7 +56,7 @@ BEGIN
         WHERE applicationid = v_applicationid;
         
     ELSE
-        DBMS_OUTPUT.PUT_LINE('Not executing the process');
+        DBMS_OUTPUT.PUT_LINE('The application is invalid');
     END IF;
 END;    
 /
@@ -69,11 +71,13 @@ change_status
 AS
     v_memberid          members.memberid%TYPE;
     v_matricno          members.matricno%TYPE;
+    v_numberupdated     NUMBER(10);
     CURSOR mem_cursor IS
     SELECT memberid, matricno
     FROM members;
 BEGIN
     OPEN mem_cursor;
+    v_numberupdated := 0;
     
     LOOP
         FETCH mem_cursor INTO v_memberid, v_matricno;
@@ -81,11 +85,15 @@ BEGIN
         
         IF v_matricno < 150000 THEN
             UPDATE members SET STATUS = 'inactive' WHERE memberid = v_memberid;
+            v_numberupdated := v_numberupdated + 1;
             DBMS_OUTPUT.PUT_LINE('The status for ' || v_memberid || ' is changed to inactive');
         END IF;
         
-        --DBMS_OUTPUT.PUT_LINE(TO_CHAR(v_memberid) || ' ' || TO_CHAR(v_matricno));
     END LOOP;
+    
+    IF v_numberupdated = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('There are no members that exceeds 5 years of study');
+    END IF;
     CLOSE mem_cursor;
 END;
 /
@@ -124,7 +132,7 @@ DECLARE
     v_number_mem    NUMBER(10);
 BEGIN 
     v_number_mem := get_member_in(26, 'IIUM Acousstic Band');
-    DBMS_OUTPUT.PUT_LINE(v_number_mem);
+    DBMS_OUTPUT.PUT_LINE('The number of members below the age of 26 is ' || v_number_mem);
 END;
 /
 
@@ -145,11 +153,23 @@ BEGIN
 END;
 /
 
--- Testing the function by getting the number of active members in IIUM Acousstic Band
+-- Testing the function by getting the number of active members in Citra
 DECLARE 
     v_number_of_members     NUMBER(10);
+    v_clubname              VARCHAR2(255);
+    CURSOR club_cursor IS
+        SELECT clubname FROM clubs;
 BEGIN
-    v_number_of_members := retrieve_active_member_in('IIUM Acousstic Band');
-    DBMS_OUTPUT.PUT_LINE('Number of active members in IIUM Acoustic Band is ' || v_number_of_members);
+    OPEN club_cursor;
+    
+    LOOP
+        FETCH club_cursor INTO v_clubname;
+        EXIT WHEN club_cursor%NOTFOUND;
+        
+        v_number_of_members := retrieve_active_member_in(v_clubname);
+        DBMS_OUTPUT.PUT_LINE(club_cursor%ROWCOUNT || '. Number of active members in IIUM Acoustic Band is ' || v_number_of_members);
+    END LOOP;
+    
+    CLOSE club_cursor;
 END;
 /

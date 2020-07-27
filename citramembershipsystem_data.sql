@@ -1,4 +1,3 @@
--- Insert Data into Tables
 
 --Users
 INSERT INTO USERS(displayname, email, userpassword) VALUES('samsuladry', 'samsul@example.com', '$2a$10$DsAmJSdmbHSoHpcaul09A.d./Wxf9i/caUKP9ggO86tr8kmMEVUzG');
