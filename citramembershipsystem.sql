@@ -1,9 +1,18 @@
+-- Create Tables, Triggers, and Sequences
+
 DROP TABLE MEMBERS cascade constraints;
 DROP TABLE CLUBS cascade constraints;
 DROP TABLE STAFFS cascade constraints;
 DROP TABLE USERS cascade constraints;
 DROP TABLE CLUB_STAFF_MANAGEMENT cascade constraints;
 DROP TABLE USER_APPLICATION cascade constraints;
+
+DROP SEQUENCE user_id_seq;
+DROP SEQUENCE club_id_seq;
+DROP SEQUENCE staff_id_seq;
+DROP SEQUENCE member_id_seq;
+DROP SEQUENCE application_id_seq;
+
 
 CREATE TABLE USERS (
     USERID          NUMBER(7),
@@ -23,7 +32,7 @@ CREATE TABLE CLUBS (
 CREATE TABLE STAFFS (
     STAFFID         NUMBER(7),
     USERID          NUMBER(7),
-    FULLFNAME       VARCHAR2(255),
+    FULLNAME       VARCHAR2(255),
     POSITION        VARCHAR2(255),
         CONSTRAINT STAFF_ID_PK PRIMARY KEY (STAFFID),
         CONSTRAINT STAFF_USER_ID_FK FOREIGN KEY (USERID) REFERENCES USERS
@@ -68,4 +77,63 @@ CREATE TABLE USER_APPLICATION (
         CONSTRAINT APPLICATION_ID_PK PRIMARY KEY (APPLICATIONID)
     );
     
+CREATE SEQUENCE user_id_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER user_on_create
+    BEFORE INSERT ON USERS
+    FOR EACH ROW
+BEGIN
+    SELECT user_id_seq.nextval
+    INTO :new.userid
+    FROM DUAL;
+END;
+/
+
+CREATE SEQUENCE club_id_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER club_on_create
+    BEFORE INSERT ON CLUBS
+    FOR EACH ROW
+BEGIN
+    SELECT club_id_seq.nextval
+    INTO :new.clubid
+    FROM DUAL;
+END;
+/
+
+CREATE SEQUENCE staff_id_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER staff_on_create
+    BEFORE INSERT ON STAFFS
+    FOR EACH ROW
+BEGIN
+    SELECT staff_id_seq.nextval
+    INTO :new.staffid
+    FROM DUAL;
+END;
+/
+
+CREATE SEQUENCE member_id_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER member_on_create
+    BEFORE INSERT ON MEMBERS
+    FOR EACH ROW
+BEGIN
+    SELECT member_id_seq.nextval
+    INTO :new.memberid
+    FROM DUAL;
+END;
+/
+
+CREATE SEQUENCE application_id_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER user_application_on_create
+    BEFORE INSERT ON user_application
+    FOR EACH ROW
+BEGIN
+    SELECT application_id_seq.nextval
+    INTO :new.applicationid
+    FROM DUAL;
+END;
+/
     
